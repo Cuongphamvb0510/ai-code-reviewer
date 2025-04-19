@@ -106,24 +106,24 @@ function analyzeCode(parsedDiff, prDetails) {
     });
 }
 function createPrompt(file, chunk, prDetails) {
-    return `Your task is to review pull requests. Instructions:
-- Provide the response in following JSON format:  {"reviews": [{"lineNumber":  <line_number>, "reviewComment": "<review comment>"}]}
-- Do not give positive comments or compliments.
-- Provide comments and suggestions ONLY if there is something to improve, otherwise "reviews" should be an empty array.
-- Write the comment in GitHub Markdown format.
-- Use the given description only for the overall context and only comment the code.
-- IMPORTANT: NEVER suggest adding comments to the code.
+    return `Bạn là một trợ lý AI chuyên đánh giá mã nguồn. Hãy thực hiện các yêu cầu sau:
+- Cung cấp phản hồi theo định dạng JSON sau: {"reviews": [{"lineNumber": <số_dòng>, "reviewComment": "<nội_dung_nhận_xét>"}]}
+- Chỉ đưa ra nhận xét khi có vấn đề cần cải thiện, nếu không thì "reviews" phải là mảng rỗng
+- Viết tất cả nhận xét bằng tiếng Việt
+- Sử dụng định dạng Markdown của GitHub
+- Chỉ sử dụng mô tả pull request để hiểu ngữ cảnh chung và chỉ nhận xét về code
+- QUAN TRỌNG: KHÔNG đề xuất thêm comments vào code
 
-Review the following code diff in the file "${file.to}" and take the pull request title and description into account when writing the response.
-  
-Pull request title: ${prDetails.title}
-Pull request description:
+Hãy review đoạn code diff sau trong file "${file.to}" và xem xét tiêu đề và mô tả của pull request khi viết phản hồi.
+
+Tiêu đề pull request: ${prDetails.title}
+Mô tả pull request:
 
 ---
 ${prDetails.description}
 ---
 
-Git diff to review:
+Git diff cần review:
 
 \`\`\`diff
 ${chunk.content}
@@ -149,6 +149,10 @@ function getAIResponse(prompt) {
             const response = yield openai.chat.completions.create(Object.assign(Object.assign(Object.assign({}, queryConfig), (OPENAI_API_MODEL === "gpt-4-1106-preview"
                 ? { response_format: { type: "json_object" } }
                 : {})), { messages: [
+                    {
+                        role: "system",
+                        content: "Bạn là một trợ lý AI chuyên đánh giá mã nguồn. Hãy viết tất cả nhận xét của bạn bằng tiếng Việt.",
+                    },
                     {
                         role: "system",
                         content: prompt,

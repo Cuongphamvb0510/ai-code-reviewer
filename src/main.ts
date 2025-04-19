@@ -78,60 +78,27 @@ async function analyzeCode(
   return comments;
 }
 
-// function createPrompt(file: File, chunk: Chunk, prDetails: PRDetails): string {
-//   return `Your task is to review pull requests. Instructions:
-// - Provide the response in following JSON format:  {"reviews": [{"lineNumber":  <line_number>, "reviewComment": "<review comment>"}]}
-// - Do not give positive comments or compliments.
-// - Provide comments and suggestions ONLY if there is something to improve, otherwise "reviews" should be an empty array.
-// - Write the comment in GitHub Markdown format.
-// - Use the given description only for the overall context and only comment the code.
-// - IMPORTANT: NEVER suggest adding comments to the code.
-
-// Review the following code diff in the file "${
-//     file.to
-//   }" and take the pull request title and description into account when writing the response.
-
-// Pull request title: ${prDetails.title}
-// Pull request description:
-
-// ---
-// ${prDetails.description}
-// ---
-
-// Git diff to review:
-
-// \`\`\`diff
-// ${chunk.content}
-// ${chunk.changes
-//   // @ts-expect-error - ln and ln2 exists where needed
-//   .map((c) => `${c.ln ? c.ln : c.ln2} ${c.content}`)
-//   .join("\n")}
-// \`\`\`
-// `;
-// }
-
 function createPrompt(file: File, chunk: Chunk, prDetails: PRDetails): string {
-  return `Your task is to review pull requests. Instructions:
-- Provide the response in following JSON format:  {"reviews": [{"lineNumber":  <line_number>, "reviewComment": "<review comment>"}]}
-- Do not give positive comments or compliments.
-- Provide comments and suggestions ONLY if there is something to improve, otherwise "reviews" should be an empty array.
-- Write the comment in GitHub Markdown format.
-- Use the given description only for the overall context and only comment the code.
-- IMPORTANT: NEVER suggest adding comments to the code.
-- IMPORTANT: Write all review comments in Vietnamese language.
+  return `Bạn là một trợ lý AI chuyên đánh giá mã nguồn. Hãy thực hiện các yêu cầu sau:
+- Cung cấp phản hồi theo định dạng JSON sau: {"reviews": [{"lineNumber": <số_dòng>, "reviewComment": "<nội_dung_nhận_xét>"}]}
+- Chỉ đưa ra nhận xét khi có vấn đề cần cải thiện, nếu không thì "reviews" phải là mảng rỗng
+- Viết tất cả nhận xét bằng tiếng Việt
+- Sử dụng định dạng Markdown của GitHub
+- Chỉ sử dụng mô tả pull request để hiểu ngữ cảnh chung và chỉ nhận xét về code
+- QUAN TRỌNG: KHÔNG đề xuất thêm comments vào code
 
-Review the following code diff in the file "${
+Hãy review đoạn code diff sau trong file "${
     file.to
-  }" and take the pull request title and description into account when writing the response.
-  
-Pull request title: ${prDetails.title}
-Pull request description:
+  }" và xem xét tiêu đề và mô tả của pull request khi viết phản hồi.
+
+Tiêu đề pull request: ${prDetails.title}
+Mô tả pull request:
 
 ---
 ${prDetails.description}
 ---
 
-Git diff to review:
+Git diff cần review:
 
 \`\`\`diff
 ${chunk.content}
